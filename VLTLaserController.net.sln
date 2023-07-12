@@ -12,6 +12,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{70875EE3-42A
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VLTLaserController.net", "src\VLTLaserController.net.csproj", "{E02630A9-2DF7-47CD-8F42-CFE4514BDB00}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{8A18AD1B-8AD7-4FFD-A32E-9F5432668E32}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VLTControllerTest", "VLTControllerTest\VLTControllerTest.csproj", "{4D6310D6-601D-44CE-9564-DFB161C9C257}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -22,12 +26,17 @@ Global
 		{E02630A9-2DF7-47CD-8F42-CFE4514BDB00}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E02630A9-2DF7-47CD-8F42-CFE4514BDB00}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E02630A9-2DF7-47CD-8F42-CFE4514BDB00}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4D6310D6-601D-44CE-9564-DFB161C9C257}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D6310D6-601D-44CE-9564-DFB161C9C257}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D6310D6-601D-44CE-9564-DFB161C9C257}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D6310D6-601D-44CE-9564-DFB161C9C257}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{E02630A9-2DF7-47CD-8F42-CFE4514BDB00} = {70875EE3-42AE-4EC4-8B19-C51A22EFDD7C}
+		{4D6310D6-601D-44CE-9564-DFB161C9C257} = {8A18AD1B-8AD7-4FFD-A32E-9F5432668E32}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E315EDC1-69D9-4882-B9DC-EB4241D15D54}
