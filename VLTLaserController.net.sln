@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.6.33815.320
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VLTLaserController.net", "VLTLaserController.net.csproj", "{E02630A9-2DF7-47CD-8F42-CFE4514BDB00}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{75829BDB-60BD-4965-9479-1ADEFCADB307}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{3880AA44-130A-483D-BDC0-8F5F9DC8B6FA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "materials", "materials", "{2729593B-9895-4B97-9EFB-1FF956638FAE}"
+	ProjectSection(SolutionItems) = preProject
+		D:\Загрузки Firefox\VLT Laser Controller_datasheet.pdf = D:\Загрузки Firefox\VLT Laser Controller_datasheet.pdf
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E02630A9-2DF7-47CD-8F42-CFE4514BDB00}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E02630A9-2DF7-47CD-8F42-CFE4514BDB00}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E02630A9-2DF7-47CD-8F42-CFE4514BDB00}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E02630A9-2DF7-47CD-8F42-CFE4514BDB00}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{E02630A9-2DF7-47CD-8F42-CFE4514BDB00} = {75829BDB-60BD-4965-9479-1ADEFCADB307}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E315EDC1-69D9-4882-B9DC-EB4241D15D54}
+	EndGlobalSection
+EndGlobal
