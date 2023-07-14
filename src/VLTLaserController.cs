@@ -1,22 +1,24 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
-using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Text;
 using VLTLaserControllerNET.Services;
 
 namespace VLTLaserControllerNET
 {
-    public class VLTLaserController
+    public class VLTLaserController : IDisposable
     {
         public event EventHandler Connected;
         public event EventHandler Disconnected;
 
-        public bool IsAlive => PingDevice();
+        public bool IsAlive => VLTLaserFinder.PingDevice(this.IPAddress);
         public bool IsConnected => WakeUpDevice();
         public bool IsPlay { get; set; } = false;
         public bool IsAutoturn { get; private set; }
         public int AutoturnTimeout { get; private set; }
+
+        public VLTLaserINFO VLTLaserInfo { get; private set; }
 
         public IPAddress IPAddress { get; set; } = new IPAddress(new byte[] { 192, 168, 1, 1 });
         public int SendPort { get; set; }
@@ -24,6 +26,7 @@ namespace VLTLaserControllerNET
         public int ReciveTimeout { get; set; } = 500;
 
         private UdpClient UdpSend { get; set; } = new UdpClient();
+
         private IPEndPoint SendEndPoint { get; set; }
 
         private UdpClient UdpReciver { get; set; }
@@ -35,6 +38,41 @@ namespace VLTLaserControllerNET
             this.SendPort = port;
         }
 
+        public bool SendFrame(byte[] frame)
+        {
+            if (this.IsConnected == true)
+            {
+                int packetLength = 1458;
+                int sessionLength = 5;
+                int frameSessionCount = (int)Math.Ceiling((double)frame.Length / (packetLength * sessionLength));
+                for (int i = 0; i < frameSessionCount; i += 1)
+                {
+                    for (int j = 0; j < sessionLength; j += 1)
+                    {
+                        int skip = (i * packetLength * sessionLength) + (j * packetLength);
+                        byte[] packet = frame.Skip(skip).Take(packetLength).ToArray();
+                        SendBytes(packet);
+                    }
+                    if (WaitBytes(ReciveTimeout).Message.StartsWith("act") == false)
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
+
+        public void TurnPlay(bool On)
+        {
+            byte[] arg = new byte[1] 
+            {
+                On ? (byte)1 : (byte)0
+            };
+            SendCommand("PLAY", arg);
+            this.IsPlay = On;
+        }
+
         // Необходимо обеспечивать последовательное соединение проекторов и наче проекторы будут слать все на один порт
         public void Connect()
         {
@@ -43,7 +81,8 @@ namespace VLTLaserControllerNET
             this.RecivedEndPoint = new IPEndPoint(IPAddress.Any, SendPort);
             this.UdpReciver = new UdpClient(RecivedEndPoint);
 
-            VLTMessage request = SendCommand("LINK", 1, ReciveTimeout);
+            byte[] args = new byte[1] { 1 };
+            VLTMessage request = SendCommand("LINK", args, ReciveTimeout);
 
             if (request.IsEmpty == false && 
                 request.IPEndPoint.Address.GetHashCode() == this.IPAddress.GetHashCode())
@@ -68,7 +107,8 @@ namespace VLTLaserControllerNET
 
         public void Disconnect()
         {
-            VLTMessage request = SendCommand("LINK", 0, ReciveTimeout);
+            byte[] args = new byte[1] { 0 };
+            VLTMessage request = SendCommand("LINK", args, ReciveTimeout);
 
             if (request.Message.StartsWith("dis") == true)
             {
@@ -86,11 +126,73 @@ namespace VLTLaserControllerNET
             this.Connect();
         }
 
-        private VLTMessage SendCommand(string command, byte arg, int timeoutrequest = 0)
+        /// <summary>
+        /// Set device color value
+        /// </summary>
+        /// <param name="colornum">1 - Red; 2 - Green; 3 - Blue</param>
+        /// <param name="value">ushort max 655535</param>
+        public void SetColor(byte colornum, ushort value)
         {
-            byte[] bytes = ByteGetter.GetStringBytes(command, 6);
-            bytes[command.Length] = arg;
-            return SendCommand(bytes, timeoutrequest);
+            string[] colorname = new string[3] 
+            {
+                "MRED",
+                "MGRN",
+                "MBLU"
+            };
+            byte[] args = BitConverter.GetBytes(value);
+            SendCommand(colorname[colornum], args);
+        }
+
+        public void TurnAutoOff(bool On, byte minutes)
+        {
+            byte[] bytes = new byte[2] 
+            { 
+                On ? (byte)1 : (byte)0, 
+                minutes 
+            };
+            SendCommand("ATOF", bytes);
+        }
+
+        /// <summary>
+        /// Save setting in permanent memmory on hardaware
+        /// </summary>
+        /// <param name="param">1 - Save ALL setting (need reset); 2 - ALL setting without ethernet (don't reset)</param>
+        public void SaveSetting(byte param)
+        {
+            byte[] args = new byte[1] { param };
+            SendCommand("SAVED", args);
+        }
+
+        /// <summary>
+        /// Turn On/Off web server
+        /// </summary>
+        /// <param name="status">1 - On; 0 - Off</param>
+        public void TurnWebServer(bool status)
+        {
+            byte[] args = new byte[1] 
+            {
+                status ? (byte)1 : (byte)0 
+            };
+            SendCommand("WEBSR", args);
+        }
+
+        public void Dispose()
+        {
+            this.Disconnect();
+        }
+
+        private VLTMessage SendCommand(string command, byte[] args, int timeoutrequest = 0)
+        {
+            if (command.Length + args.Length < 7)
+            {
+                byte[] bytes = ByteGetter.GetStringBytes(command, 6);
+                for (int i = 0; i < args.Length; i += 1)
+                {
+                    bytes[command.Length + i] = args[i];
+                    return SendCommand(bytes, timeoutrequest);
+                }
+            }
+            return new VLTMessage();
         }
 
         private VLTMessage SendCommand(string command, int timeoutrequest = 0)
@@ -142,12 +244,6 @@ namespace VLTLaserControllerNET
             }
 
             return new VLTMessage();
-        }
-
-        private bool PingDevice()
-        {
-            Ping p = new Ping();
-            return p.Send(this.IPAddress).Status == IPStatus.Success;
         }
 
         private bool WakeUpDevice()

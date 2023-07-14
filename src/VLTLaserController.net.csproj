@@ -43,8 +43,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Services\ByteGetter.cs" />
+    <Compile Include="Services\VLTLaserFinder.cs" />
     <Compile Include="VLTLaserController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="VLTLaserINFO.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
