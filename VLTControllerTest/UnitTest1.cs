@@ -1,6 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
-using System;
 using System.Net;
 using System.Threading;
 using VLTLaserControllerNET;
@@ -57,15 +56,16 @@ namespace VLTControllerTest
             Thread.Sleep(100);
             VLTLaserController laserController = new VLTLaserController(_address, 5011);
             laserController.Connect();
-            string path = "C:\\Users\\Urbaraban\\source\\repos\\VLTLaserController.net\\VLTControllerTest\\test_file\\v0_3d_full.ild";
+            string path = "C:\\Users\\Urbaraban\\source\\repos\\VLTLaserController.net\\VLTControllerTest\\test_file\\export_0_192.168.33.199.ild";
             using (BinaryReader reader = new BinaryReader(File.Open(path, FileMode.Open)))
             {
                 if (reader.ReadBytes((int)reader.BaseStream.Length) is byte[] b)
                 {
+                    laserController.SetColor(1, ushort.MaxValue);
                     laserController.TurnPlay(true);
                     Assert.IsTrue(laserController.SendFrame(b));
                 }
-            }
+            } 
             Thread.Sleep(5000);
             laserController.Disconnect();
         }

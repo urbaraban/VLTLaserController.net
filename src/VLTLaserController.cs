@@ -44,12 +44,14 @@ namespace VLTLaserControllerNET
             {
                 int packetLength = 1458;
                 int sessionLength = 5;
+                int sessionsize = packetLength * sessionLength;
+
                 int frameSessionCount = (int)Math.Ceiling((double)frame.Length / (packetLength * sessionLength));
                 for (int i = 0; i < frameSessionCount; i += 1)
                 {
-                    for (int j = 0; j < sessionLength; j += 1)
+                    for (int j = 0; j < Math.Min(sessionsize, frame.Length - sessionsize * i); j += packetLength)
                     {
-                        int skip = (i * packetLength * sessionLength) + (j * packetLength);
+                        int skip = i * sessionsize + j;
                         byte[] packet = frame.Skip(skip).Take(packetLength).ToArray();
                         SendBytes(packet);
                     }
@@ -67,7 +69,7 @@ namespace VLTLaserControllerNET
         {
             byte[] arg = new byte[1] 
             {
-                On ? (byte)1 : (byte)0
+                Convert.ToByte(On)
             };
             SendCommand("PLAY", arg);
             this.IsPlay = On;
@@ -95,6 +97,7 @@ namespace VLTLaserControllerNET
                     this.ReceivePort = (request.Bytes[3] << 8) | request.Bytes[4];
                     this.RecivedEndPoint = new IPEndPoint(IPAddress.Any, ReceivePort);
                     this.UdpReciver = new UdpClient(RecivedEndPoint);
+                    UpdateInfo();
                     Connected?.Invoke(this, new EventArgs());
                 }
             }
@@ -103,6 +106,12 @@ namespace VLTLaserControllerNET
                 UdpReciver.Close();
                 UdpReciver.Dispose();
             }
+        }
+
+        public void UpdateInfo()
+        {
+            VLTMessage request = SendCommand("INFO", ReciveTimeout);
+            this.VLTLaserInfo = new VLTLaserINFO(request.Message);
         }
 
         public void Disconnect()
@@ -146,8 +155,8 @@ namespace VLTLaserControllerNET
         public void TurnAutoOff(bool On, byte minutes)
         {
             byte[] bytes = new byte[2] 
-            { 
-                On ? (byte)1 : (byte)0, 
+            {
+                Convert.ToByte(On),
                 minutes 
             };
             SendCommand("ATOF", bytes);
@@ -171,9 +180,17 @@ namespace VLTLaserControllerNET
         {
             byte[] args = new byte[1] 
             {
-                status ? (byte)1 : (byte)0 
+                Convert.ToByte(status)
             };
             SendCommand("WEBSR", args);
+        }
+
+        public void SetFlip(bool x, bool y)
+        {
+            byte[] argx = new byte[1] { Convert.ToByte(x) };
+            SendCommand("FLIPX", argx);
+            byte[] argy = new byte[1] { Convert.ToByte(y) };
+            SendCommand("FLIPY", argy);
         }
 
         public void Dispose()
