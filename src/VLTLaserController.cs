@@ -40,7 +40,7 @@ namespace VLTLaserControllerNET
 
         public bool SendFrame(byte[] frame)
         {
-            if (this.IsConnected == true)
+            if (this.IsAlive == true)
             {
                 int packetLength = 1458;
                 int sessionLength = 5;
@@ -78,6 +78,11 @@ namespace VLTLaserControllerNET
         // Необходимо обеспечивать последовательное соединение проекторов и наче проекторы будут слать все на один порт
         public void Connect()
         {
+            if (this.UdpReciver != null)
+            {
+                this.Disconnect();
+            }
+
             SendEndPoint = new IPEndPoint(IPAddress, SendPort);
 
             this.RecivedEndPoint = new IPEndPoint(IPAddress.Any, SendPort);
@@ -103,8 +108,9 @@ namespace VLTLaserControllerNET
             }
             else
             {
-                UdpReciver.Close();
-                UdpReciver.Dispose();
+                this.UdpReciver.Close();
+                this.UdpReciver.Dispose();
+                this.UdpReciver = null;
             }
         }
 
@@ -124,6 +130,12 @@ namespace VLTLaserControllerNET
                 this.IsAutoturn = request.Bytes[3] == 0x01;
                 this.AutoturnTimeout = int.Parse(request.Bytes[4].ToString("X2"), System.Globalization.NumberStyles.HexNumber);
             }
+            if (this.UdpReciver != null)
+            {
+                this.UdpReciver.Close();
+                this.UdpReciver.Dispose();
+                this.UdpReciver = null;
+            }
         }
 
         public void Reset()
@@ -132,6 +144,7 @@ namespace VLTLaserControllerNET
             while (this.IsAlive == false) { }
             this.UdpReciver.Close();
             this.UdpReciver.Dispose();
+            this.UdpReciver = null;
             this.Connect();
         }
 
@@ -245,7 +258,7 @@ namespace VLTLaserControllerNET
 
         private VLTMessage WaitBytes(int timeout)
         {
-            if (timeout > 0 && UdpReciver.Client != null)
+            if (timeout > 0 && UdpReciver != null)
             {
                 try
                 {

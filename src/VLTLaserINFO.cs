@@ -47,39 +47,41 @@ namespace VLTLaserControllerNET
         {
             Dictionary<string, string> keys = GetDictionary(message);
 
-            IPAddress = new IPAddress(new byte[4] 
-            { 
+            if (keys != null && keys.Count > 0 )
+            {
+                IPAddress = new IPAddress(new byte[4]
+{
                 byte.Parse(keys["IP_0"]),
                 byte.Parse(keys["IP_1"]),
                 byte.Parse(keys["IP_2"]),
                 byte.Parse(keys["IP_3"])
-            });
-            Port = int.Parse(keys["port"]);
+});
+                Port = int.Parse(keys["port"]);
 
-            GateIPAddress = new IPAddress(new byte[4]
-            {
+                GateIPAddress = new IPAddress(new byte[4]
+                {
                 byte.Parse(keys["gate_ip_1"]),
                 byte.Parse(keys["gate_ip_2"]),
                 byte.Parse(keys["gate_ip_3"]),
                 byte.Parse(keys["gate_ip_4"])
-            });
+                });
 
-            GateIPAddress = new IPAddress(new byte[4]
-            {
+                GateIPAddress = new IPAddress(new byte[4]
+                {
                 byte.Parse(keys["mask_1"]),
                 byte.Parse(keys["mask_2"]),
                 byte.Parse(keys["mask_3"]),
                 byte.Parse(keys["mask_4"])
-            });
-            MacAddress = $"{keys["mac_1"]}:{keys["mac_2"]}:{keys["mac_3"]}:{keys["mac_4"]}:{keys["mac_5"]}:{keys["mac_6"]}";
-            AutoOff = Convert.ToBoolean(byte.Parse(keys["auto_off"]));
+                });
+                MacAddress = $"{keys["mac_1"]}:{keys["mac_2"]}:{keys["mac_3"]}:{keys["mac_4"]}:{keys["mac_5"]}:{keys["mac_6"]}";
+                AutoOff = Convert.ToBoolean(byte.Parse(keys["auto_off"]));
 
-            Pos_X = short.Parse(keys["pos_x"]);
-            Pos_Y = short.Parse(keys["pos_y"]);
+                Pos_X = short.Parse(keys["pos_X"]);
+                Pos_Y = short.Parse(keys["pos_Y"]);
 
-            Firmware_ver = keys["firmware_ver"];
-            LaserOn = Convert.ToBoolean(byte.Parse(keys["laser_on"]));
-
+                Firmware_ver = keys["firmware_ver"];
+                LaserOn = Convert.ToBoolean(byte.Parse(keys["laser_on"]));
+            }
         }
 
         private Dictionary<string, string> GetDictionary(string message)
@@ -90,7 +92,12 @@ namespace VLTLaserControllerNET
                 string[] item = line.Split('=');
                 dic.Add(item[0], item[1]);
             }
-            return dic;
+
+            if (dic.Count > 0)
+            {
+                return dic;
+            }
+            return null;
         }
     }
 }
