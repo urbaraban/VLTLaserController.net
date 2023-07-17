@@ -15,7 +15,7 @@ namespace VLTLaserControllerNET.Services
 
         public static bool PingDevice(IPAddress iPAddress)
         {
-            Ping p = new Ping();
+            var p = new Ping();
             return p.Send(iPAddress).Status == IPStatus.Success;
         }
     }

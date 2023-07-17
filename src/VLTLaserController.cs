@@ -1,8 +1,10 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading.Tasks;
 using VLTLaserControllerNET.Services;
 
 namespace VLTLaserControllerNET
@@ -32,37 +34,40 @@ namespace VLTLaserControllerNET
         private UdpClient UdpReciver { get; set; }
         private IPEndPoint RecivedEndPoint { get; set; }
 
+        private Task SendTask { get; set; }
+
         public VLTLaserController(IPAddress address, int port = 5011)
         {
             this.IPAddress = address;
             this.SendPort = port;
         }
 
-        public bool SendFrame(byte[] frame)
+        public async void SendFrame(byte[] frame, ushort scanrate, byte shift = 0)
         {
-            if (this.IsAlive == true)
-            {
-                int packetLength = 1458;
-                int sessionLength = 5;
-                int sessionsize = packetLength * sessionLength;
+            int packetLength = 1458;
+            int sessionLength = 5;
+            int sessionsize = packetLength * sessionLength;
 
-                int frameSessionCount = (int)Math.Ceiling((double)frame.Length / (packetLength * sessionLength));
-                for (int i = 0; i < frameSessionCount; i += 1)
+            var args = BitConverter.GetBytes(scanrate);
+            SendCommand("SCAN", args);
+
+            var shiftarg = new byte[1] { shift };
+            SendCommand("SHIF", shiftarg);
+
+            int frameSessionCount = (int)Math.Ceiling((double)frame.Length / (packetLength * sessionLength));
+            for (int i = 0; i < frameSessionCount; i += 1)
+            {
+                for (int j = 0; j < Math.Min(sessionsize, frame.Length - sessionsize * i); j += packetLength)
                 {
-                    for (int j = 0; j < Math.Min(sessionsize, frame.Length - sessionsize * i); j += packetLength)
-                    {
-                        int skip = i * sessionsize + j;
-                        byte[] packet = frame.Skip(skip).Take(packetLength).ToArray();
-                        SendBytes(packet);
-                    }
-                    if (WaitBytes(ReciveTimeout).Message.StartsWith("act") == false)
-                    {
-                        return false;
-                    }
+                    int skip = i * sessionsize + j;
+                    byte[] packet = frame.Skip(skip).Take(packetLength).ToArray();
+                    SendBytes(packet);
                 }
-                return true;
+                if (WaitBytes(ReciveTimeout).Message.StartsWith("act") == false)
+                {
+                    return;
+                }
             }
-            return false;
         }
 
         public void TurnPlay(bool On)
@@ -146,6 +151,13 @@ namespace VLTLaserControllerNET
             this.UdpReciver.Dispose();
             this.UdpReciver = null;
             this.Connect();
+        }
+
+        public void SetPort(ushort port)
+        {
+            ReceivePort = port;
+            byte[] args = BitConverter.GetBytes(port);
+            SendCommand("PORT", args, ReciveTimeout);
         }
 
         /// <summary>
