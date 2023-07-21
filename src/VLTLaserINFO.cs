@@ -15,8 +15,8 @@ namespace VLTLaserControllerNET
         string MacAddress { get; } = string.Empty;
         //size_X=10708 & size_Y=10708 &
         //pos_X=-2785 & pos_Y=11779 &
-        short Pos_X { get; } = 0;
-        short Pos_Y { get; } = 0;
+        public short Pos_X { get; } = 0;
+        public short Pos_Y { get; } = 0;
         //rota=0 &
         //flip_X=0 & flip_Y=1 &
         //scanrate_chek=1 & scanrate=3855 & fps=30 & avto_colorshift=0 & colorshift=-3 & blanking_off=0 & 
@@ -27,18 +27,19 @@ namespace VLTLaserControllerNET
         //time_hours = 14 &
         //time_minutes = 12 &
         //auto_off = 0 & 
-        bool AutoOff = false;
+        public bool AutoOff = false;
         //stop_work=11 &
         //laser_ID=1105 &
         //firmware_ver=1_1_v_5 &
-        string Firmware_ver = string.Empty;
+        public string Firmware_ver = string.Empty;
         //stabl=1 &
         //laser_on=0 &
-        bool LaserOn = false;
+        public bool LaserOn = false;
         //temp_galvo_fist=00 &
         //temp_galvo_last = 0 & 
         //temp_laser_fist = 00 &
         //temp_laser_last = 0 &
+        public bool WebServer { get; set; } = false;
         //web_server = 1 &
         //lx = 0 & cr = 0 &
         //end=0
@@ -50,12 +51,13 @@ namespace VLTLaserControllerNET
             if (keys != null && keys.Count > 0 )
             {
                 IPAddress = new IPAddress(new byte[4]
-{
-                byte.Parse(keys["IP_0"]),
-                byte.Parse(keys["IP_1"]),
-                byte.Parse(keys["IP_2"]),
-                byte.Parse(keys["IP_3"])
-});
+                {
+                    byte.Parse(keys["IP_0"]),
+                    byte.Parse(keys["IP_1"]),
+                    byte.Parse(keys["IP_2"]),
+                    byte.Parse(keys["IP_3"])
+                });
+
                 Port = int.Parse(keys["port"]);
 
                 GateIPAddress = new IPAddress(new byte[4]
@@ -80,7 +82,9 @@ namespace VLTLaserControllerNET
                 Pos_Y = short.Parse(keys["pos_Y"]);
 
                 Firmware_ver = keys["firmware_ver"];
+
                 LaserOn = Convert.ToBoolean(byte.Parse(keys["laser_on"]));
+                WebServer = Convert.ToBoolean(byte.Parse(keys["web_server"]) > 0);
             }
         }
 

@@ -1,9 +1,9 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using VLTLaserControllerNET.Services;
 
@@ -15,7 +15,7 @@ namespace VLTLaserControllerNET
         public event EventHandler Disconnected;
 
         public bool IsAlive => VLTLaserFinder.PingDevice(this.IPAddress);
-        public bool IsConnected => WakeUpDevice();
+        public bool IsConnected => VLTLaserInfo != null;
         public bool IsPlay { get; set; } = false;
         public bool IsAutoturn { get; private set; }
         public int AutoturnTimeout { get; private set; }
@@ -34,30 +34,23 @@ namespace VLTLaserControllerNET
         private UdpClient UdpReciver { get; set; }
         private IPEndPoint RecivedEndPoint { get; set; }
 
-        private Task SendTask { get; set; }
-
         public VLTLaserController(IPAddress address, int port = 5011)
         {
             this.IPAddress = address;
             this.SendPort = port;
         }
 
-        public async void SendFrame(byte[] frame, ushort scanrate, byte shift = 0)
+        public async void SendFrame(byte[] frame)
         {
             int packetLength = 1458;
-            int sessionLength = 5;
+            int sessionLength = VLTLaserInfo.WebServer == false ? 10 : 5;
             int sessionsize = packetLength * sessionLength;
-
-            var args = BitConverter.GetBytes(scanrate);
-            SendCommand("SCAN", args);
-
-            var shiftarg = new byte[1] { shift };
-            SendCommand("SHIF", shiftarg);
 
             int frameSessionCount = (int)Math.Ceiling((double)frame.Length / (packetLength * sessionLength));
             for (int i = 0; i < frameSessionCount; i += 1)
             {
-                for (int j = 0; j < Math.Min(sessionsize, frame.Length - sessionsize * i); j += packetLength)
+                int sessinactualsize = Math.Min(sessionsize, frame.Length - sessionsize * i);
+                for (int j = 0; j < sessinactualsize; j += packetLength)
                 {
                     int skip = i * sessionsize + j;
                     byte[] packet = frame.Skip(skip).Take(packetLength).ToArray();
@@ -292,6 +285,17 @@ namespace VLTLaserControllerNET
         {
             VLTMessage request = SendCommand("QUERY", ReciveTimeout);
             return request.IsEmpty == false && request.Message.StartsWith("act");
+        }
+
+        public void SendScan(ushort delay)
+        {
+            byte[] bytes = BitConverter.GetBytes(delay);
+            this.SendCommand("SCAN", bytes);
+        }
+
+        public void SendShift(byte shift)
+        {
+            SendCommand("SHIF", shift);
         }
     }
 
