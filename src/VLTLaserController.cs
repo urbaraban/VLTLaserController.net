@@ -42,24 +42,28 @@ namespace VLTLaserControllerNET
 
         public async void SendFrame(byte[] frame)
         {
-            int packetLength = 1458;
-            int sessionLength = VLTLaserInfo.WebServer == false ? 10 : 5;
-            int sessionsize = packetLength * sessionLength;
-
-            int frameSessionCount = (int)Math.Ceiling((double)frame.Length / (packetLength * sessionLength));
-            for (int i = 0; i < frameSessionCount; i += 1)
+            if (this.IsConnected == true)
             {
-                int sessinactualsize = Math.Min(sessionsize, frame.Length - sessionsize * i);
-                for (int j = 0; j < sessinactualsize; j += packetLength)
+                int packetLength = 1458;
+                int sessionLength = VLTLaserInfo.WebServer == false ? 10 : 5;
+                int sessionsize = packetLength * sessionLength;
+
+                int frameSessionCount = (int)Math.Ceiling((double)frame.Length / (packetLength * sessionLength));
+                for (int i = 0; i < frameSessionCount; i += 1)
                 {
-                    int skip = i * sessionsize + j;
-                    byte[] packet = frame.Skip(skip).Take(packetLength).ToArray();
-                    SendBytes(packet);
+                    int sessinactualsize = Math.Min(sessionsize, frame.Length - sessionsize * i);
+                    for (int j = 0; j < sessinactualsize; j += packetLength)
+                    {
+                        int skip = i * sessionsize + j;
+                        byte[] packet = frame.Skip(skip).Take(packetLength).ToArray();
+                        SendBytes(packet);
+                    }
+                    if (WaitBytes(ReciveTimeout).Message.StartsWith("act") == false)
+                    {
+                        return;
+                    }
                 }
-                if (WaitBytes(ReciveTimeout).Message.StartsWith("act") == false)
-                {
-                    return;
-                }
+                Thread.Sleep(10);
             }
         }
 
@@ -224,8 +228,8 @@ namespace VLTLaserControllerNET
                 for (int i = 0; i < args.Length; i += 1)
                 {
                     bytes[command.Length + i] = args[i];
-                    return SendCommand(bytes, timeoutrequest);
                 }
+                return SendCommand(bytes, timeoutrequest);
             }
             return new VLTMessage();
         }
@@ -287,7 +291,7 @@ namespace VLTLaserControllerNET
             return request.IsEmpty == false && request.Message.StartsWith("act");
         }
 
-        public void SendScan(ushort delay)
+        public void SendScan(short delay)
         {
             byte[] bytes = BitConverter.GetBytes(delay);
             this.SendCommand("SCAN", bytes);
