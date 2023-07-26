@@ -33,10 +33,10 @@ namespace VLTLaserControllerNET
         private UdpClient UdpReciver { get; set; }
         private IPEndPoint RecivedEndPoint { get; set; }
 
-        public VLTLaserController(IPAddress address, int port = 5011)
+        public VLTLaserController(IPAddress address, int number = 0)
         {
             this.IPAddress = address;
-            this.SendPort = port;
+            this.SendPort = 5011 + number;
         }
 
         public async void SendFrame(byte[] frame)
@@ -83,9 +83,9 @@ namespace VLTLaserControllerNET
                 this.Disconnect();
             }
 
-            SendEndPoint = new IPEndPoint(IPAddress, SendPort);
+            SendEndPoint = new IPEndPoint(IPAddress, 5011);
 
-            this.RecivedEndPoint = new IPEndPoint(IPAddress.Any, SendPort);
+            this.RecivedEndPoint = new IPEndPoint(IPAddress.Any, 5011);
             this.UdpReciver = new UdpClient(RecivedEndPoint);
 
             byte[] args = new byte[1] { 1 };
