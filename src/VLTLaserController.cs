@@ -327,6 +327,5 @@ namespace VLTLaserControllerNET
 
         public VLTMessage(string message, int length, IPEndPoint iPEndPoint) : this(iPEndPoint) => 
             this.Bytes = ByteGetter.GetStringBytes(message, length);
-        
     }
 }
