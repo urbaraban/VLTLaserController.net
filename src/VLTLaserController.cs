@@ -15,7 +15,6 @@ namespace VLTLaserControllerNET
         public event EventHandler Disconnected;
 
         public bool IsAlive => VLTLaserFinder.PingDevice(this.IPAddress);
-        public bool IsConnected => VLTLaserInfo != null;
         public bool IsPlay { get; set; } = false;
         public bool IsAutoturn { get; private set; }
         public int AutoturnTimeout { get; private set; }
@@ -42,7 +41,7 @@ namespace VLTLaserControllerNET
 
         public async void SendFrame(byte[] frame)
         {
-            if (this.IsConnected == true)
+            if (this.VLTLaserInfo != null)
             {
                 int packetLength = 1458;
                 int sessionLength = VLTLaserInfo.WebServer == false ? 10 : 5;
@@ -63,7 +62,6 @@ namespace VLTLaserControllerNET
                         return;
                     }
                 }
-                Thread.Sleep(10);
             }
         }
 
@@ -285,7 +283,7 @@ namespace VLTLaserControllerNET
             return new VLTMessage();
         }
 
-        private bool WakeUpDevice()
+        public bool WakeUpDevice()
         {
             VLTMessage request = SendCommand("QUERY", ReciveTimeout);
             return request.IsEmpty == false && request.Message.StartsWith("act");
