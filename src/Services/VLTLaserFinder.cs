@@ -9,10 +9,6 @@ namespace VLTLaserControllerNET.Services
         private UdpClient UdpSend { get; set; } = new UdpClient();
         private IPEndPoint SendEndPoint { get; set; }
 
-        private UdpClient UdpReciver { get; set; }
-        private IPEndPoint RecivedEndPoint { get; set; }
-
-
         public static bool PingDevice(IPAddress iPAddress)
         {
             var p = new Ping();
