@@ -45,7 +45,8 @@
     <Compile Include="Services\ByteGetter.cs" />
     <Compile Include="Services\VLTLaserFinder.cs" />
     <Compile Include="Services\VLTPacketManager.cs" />
-    <Compile Include="UdpController.cs" />
+    <Compile Include="UdpConnector.cs" />
+    <Compile Include="VLTSender.cs" />
     <Compile Include="VLTLaserController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VLTLaserINFO.cs" />
