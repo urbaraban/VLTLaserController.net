@@ -6,7 +6,6 @@ namespace VLTLaserControllerNET
 {
     public class VLTLaserController : VLTSender
     {
-
         public bool IsAlive => VLTLaserFinder.PingDevice(this.IPAddress);
         public bool IsPlay { get; set; } = false;
         public bool IsAutoturn { get; private set; }
