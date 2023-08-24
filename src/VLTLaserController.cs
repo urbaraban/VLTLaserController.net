@@ -57,9 +57,9 @@ namespace VLTLaserControllerNET
                         byte[] packet = frame.Skip(skip).Take(packetLength).ToArray();
                         SendBytes(packet);
                     }
-                    if (WaitBytes(ReciveTimeout).Message.StartsWith("act") == false)
+                    while (WaitBytes(ReciveTimeout).Message.StartsWith("act") == false)
                     {
-                        return;
+                        //return;
                     }
                 }
             }
@@ -260,6 +260,7 @@ namespace VLTLaserControllerNET
             if (bytes.Length > 0 && SendEndPoint != null)
             {
                 UdpSend.Send(bytes, bytes.Length, SendEndPoint);
+                Thread.Sleep(5);
             }
         }
 
