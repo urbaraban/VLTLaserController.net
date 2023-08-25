@@ -3,6 +3,7 @@ using System;
 using VLTLaserControllerNET.Services;
 using System.Net.Sockets;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace VLTLaserControllerNET
 {
@@ -14,6 +15,7 @@ namespace VLTLaserControllerNET
         public int SendSpeedKbit => 2048 * (VLTLaserInfo.WebServer == true ? 4 : 8);
 
         public VLTLaserINFO VLTLaserInfo { get; private set; }
+
 
         public void UpdateInfo()
         {
@@ -62,10 +64,11 @@ namespace VLTLaserControllerNET
 
         public async void SendFrame(byte[] frame)
         {
+            //if (true)
             if (this.VLTLaserInfo != null)
             {
-                int bytePerSecond = (int)SendSpeedKbit;
-                double microsecondbyte = 1000000.0 / bytePerSecond;
+                int bytePerSecond = (int)10 * 125000;
+                double microsecondbyte = 1000000.0 / bytePerSecond; ;
 
                 int packetLength = 1458;
                 int sessionLength = VLTLaserInfo.WebServer == false ? 10 : 5;
@@ -87,6 +90,7 @@ namespace VLTLaserControllerNET
                         return;
                     }
                 }
+                udelay((int)(1000 * microsecondbyte));
             }
         }
 
