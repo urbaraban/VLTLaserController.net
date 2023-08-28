@@ -67,7 +67,7 @@ namespace VLTLaserControllerNET
             //if (true)
             if (this.VLTLaserInfo != null)
             {
-                int bytePerSecond = (int)10 * 125000;
+                int bytePerSecond = (int)1 * 125000;
                 double microsecondbyte = 1000000.0 / bytePerSecond; ;
 
                 int packetLength = 1458;
