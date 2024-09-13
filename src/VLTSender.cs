@@ -14,7 +14,7 @@ namespace VLTLaserControllerNET
 
         public int SendSpeedKbit => 2048 * (VLTLaserInfo.WebServer == true ? 4 : 8);
 
-        public VLTLaserINFO VLTLaserInfo { get; private set; }
+        public VLTLaserINFO VLTLaserInfo { get; protected set; }
 
 
         public void UpdateInfo()

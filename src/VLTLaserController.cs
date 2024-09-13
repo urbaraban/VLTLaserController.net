@@ -23,6 +23,7 @@ namespace VLTLaserControllerNET
                 this.IsAutoturn = request.Bytes[3] == 0x01;
                 this.AutoturnTimeout = int.Parse(request.Bytes[4].ToString("X2"), System.Globalization.NumberStyles.HexNumber);
             }
+            this.VLTLaserInfo = null;
             base.Disconnect();
         }
 
