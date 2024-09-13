@@ -23,16 +23,16 @@ namespace VLTLaserControllerNET
             this.VLTLaserInfo = new VLTLaserINFO(request.Message);
         }
 
-        public void Connect()
+        public void Connect(int port)
         {
             if (this.UdpReciver != null)
             {
                 this.Disconnect();
             }
 
-            SendEndPoint = new IPEndPoint(IPAddress, 5011);
+            SendEndPoint = new IPEndPoint(IPAddress, port);
 
-            this.RecivedEndPoint = new IPEndPoint(IPAddress.Any, 5011);
+            this.RecivedEndPoint = new IPEndPoint(IPAddress.Any, port);
             this.UdpReciver = new UdpClient(RecivedEndPoint);
 
             byte[] args = new byte[1] { 1 };
@@ -46,8 +46,8 @@ namespace VLTLaserControllerNET
                 {
                     this.UdpReciver.Close();
                     UdpReciver.Dispose();
-                    this.ReceivePort = (request.Bytes[3] << 8) | request.Bytes[4];
-                    this.RecivedEndPoint = new IPEndPoint(IPAddress.Any, ReceivePort);
+                    //this.ReceivePort = (request.Bytes[3] << 8) | request.Bytes[4];
+                    this.RecivedEndPoint = new IPEndPoint(IPAddress.Any, port + 1);
                     this.UdpReciver = new UdpClient(RecivedEndPoint);
                     UpdateInfo();
                     Connected?.Invoke(this, new EventArgs());

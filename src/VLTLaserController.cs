@@ -26,10 +26,9 @@ namespace VLTLaserControllerNET
             base.Disconnect();
         }
 
-        public VLTLaserController(IPAddress address, int number = 0)
+        public VLTLaserController(IPAddress address)
         {
             this.IPAddress = address;
-            this.SendPort = 5011 + number;
         }
 
 
@@ -46,20 +45,20 @@ namespace VLTLaserControllerNET
 
         // Необходимо обеспечивать последовательное соединение проекторов и наче проекторы будут слать все на один порт
 
-        public void Reset()
+        public void Reset(int port)
         {
             SendCommand("RESET", ReciveTimeout);
             while (this.IsAlive == false) { }
             base.Disconnect();
-            base.Connect();
+            base.Connect(port);
         }
 
-        public void SetPort(ushort port)
-        {
-            ReceivePort = port;
-            byte[] args = BitConverter.GetBytes(port);
-            SendCommand("PORT", args, ReciveTimeout);
-        }
+        //public void SetPort(ushort port)
+        //{
+        //    ReceivePort = port;
+        //    byte[] args = BitConverter.GetBytes(port);
+        //    SendCommand("PORT", args, ReciveTimeout);
+        //}
 
         /// <summary>
         /// Set device color value

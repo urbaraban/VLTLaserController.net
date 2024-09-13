@@ -10,11 +10,7 @@ namespace VLTLaserControllerNET
         public int Port { get; }
         public IPAddress GateIPAddress { get; }
         public IPAddress Mask { get; }
-        //mask_1 = 255 & mask_2 = 255 & mask_3 = 255 & mask_4 = 0
-        //mac_1 = 0x00 & mac_2 = 0x08 & mac_3 = 0xDC & mac_4=0x22 & mac_5=0x4D & mac_6=0xC8
         string MacAddress { get; } = string.Empty;
-        //size_X=10708 & size_Y=10708 &
-        //pos_X=-2785 & pos_Y=11779 &
         public short Pos_X { get; } = 0;
         public short Pos_Y { get; } = 0;
         //rota=0 &

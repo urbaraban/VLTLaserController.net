@@ -15,7 +15,6 @@ namespace VLTLaserControllerNET
         protected IPEndPoint RecivedEndPoint { get; set; }
 
         public int SendPort { get; set; }
-        protected int ReceivePort { get; set; }
         protected int ReciveTimeout { get; set; } = 500;
 
         public IPAddress IPAddress { get; set; } = new IPAddress(new byte[] { 192, 168, 1, 1 });
